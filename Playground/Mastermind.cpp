@@ -7,22 +7,22 @@ class GameBoard
 {
 public:
 
-	string code;
 	string pause;
 	bool done = false;
+	bool duplicates = false;
+	char codeArr[CODELENGTH];
 
-	int whitePegs = 0;
-	int redPegs = 0;
 	int numOfTurns = NUMOFTURNS;
-	int mode = GAMEMODE;
+	int mode;
 	int turnNum = 0;
 	string headerHash = "#";
 	string headerDash = "-";
 	string header = "|";
-	string columnNumbers = "| ";
+	string columnNumbers = "|";
 	string emptyLine = "|   |";
 	string flatLine = "_____";
 	string bracketFlatLine = "|-----";
+	string user;
 
 
 
@@ -41,7 +41,10 @@ public:
 		cout << "Press enter to continue\n";
 		getline(cin, pause, '\n');
 		system("CLS");
-
+		setUser();
+		system("CLS");
+		setMode();
+		system("CLS");
 		setCode();
 		system("CLS");
 		{
@@ -50,7 +53,7 @@ public:
 				emptyLine += "   |";
 				flatLine += "____";
 				bracketFlatLine += "----";
-				columnNumbers += to_string(i + 1) + "   ";
+				columnNumbers += " " + to_string(i + 1) + "  ";
 				if (i > 2)
 				{
 					headerHash += "#";
@@ -65,27 +68,103 @@ public:
 
 			emptyLine += "\n";
 
-			columnNumbers += "? | \n";
+			columnNumbers += "R W| \n";
 
 			header += headerHash + headerDash + "MASTERMINDS" + headerDash + headerHash + "|\n" + columnNumbers;
 		}
 		drawBoard();
 	}
 
-	//sets code to be sought	
+	void resetGame()
+	{
+
+	}
+
+	void setMode()
+	{
+		string modeSelect = "";
+		cout << "Single or Multiplayer?\nType 'Y' for Single Player or 'N' for Multiplayer\n";
+		getline(cin, modeSelect, '\n');
+		while (modeSelect != "Y" && modeSelect != "N")
+		{
+			system("CLS");
+			cout << "Error : Wrong input\n" << "You typed '" << modeSelect << "'" << endl << "Please Type 'Y' for Single Player or 'N' for Multiplayer\n";
+			modeSelect = "";
+			getline(cin, modeSelect, '\n');
+		}
+		if (modeSelect == "Y")
+		{
+			mode = SINGLEPLAYER;
+			system("CLS");
+			cout << "Allow duplicates?\n'Y' for yes 'N' for no\n";
+			modeSelect = "";
+			getline(cin, modeSelect, '\n');
+			while (modeSelect != "Y" && modeSelect != "N")
+			{
+				system("CLS");
+				cout << "Error : Wrong input\n" << "You typed " << modeSelect << endl << "Please Type 'Y' to allow duplicates or 'N' to not\n";
+				modeSelect = "";
+				getline(cin, modeSelect, '\n');
+			}
+			if (modeSelect == "Y")
+			{
+				duplicates = true;
+			}
+		}
+		else
+		{
+			mode = MULTIPLAYER;
+		}
+	}
+	// gathers users name
+	void setUser()
+	{
+		cout << "What is your name?" << endl;
+		getline(cin, user, '\n');
+		if (user == "Hannah" || user == "hannah")
+		{
+			user = "TIM";
+		}
+	}
+
+	//sets code to be sought and puts it into an array
 	void setCode() {
-		cout << "Please enter " << CODELENGTH << " letters llimited to " << VALID_CHARACTERS << endl;
-		getline(cin, code, '\n');
-		// NEEDS ERROR testing
+		string codeStr;
+		if (mode == SINGLEPLAYER)
+		{
+			codeStr = VALID_CHARACTERS;
+			for (int i = 0; i < CODELENGTH; i++)
+			{
+				int randomNum = time(NULL) % codeStr.length();
+				codeArr[i] = codeStr.at(randomNum);
+				if (!duplicates)
+				{
+					string str1 = codeStr.substr(randomNum + 1);
+					string str2 = codeStr.substr(0, randomNum);
+					codeStr = str1 + str2;
+				}
+			}
+		}
+		else
+		{
+			cout << "Please enter " << CODELENGTH << " letters limited to " << VALID_CHARACTERS << endl;
+			codeStr = getInput("Code");
+			for (int i = CODELENGTH - 1; i >= 0; i--)
+			{
+				codeArr[i] = codeStr.back();
+				codeStr.pop_back();
+			}
+		}
+		// NEEDS ERROR testing baad
+		// add testing to getInput, should apply to both
 	}
 
 	// draws boar given the state of playingBoard
 	void drawBoard() {
-		// initaial drawing - creates empty board
+		// initial drawing - creates empty board
 		cout << flatLine << header << bracketFlatLine;
 
 		string output = "";
-
 		for (int i = 0; i < NUMOFTURNS; i++)
 		{
 
@@ -97,39 +176,51 @@ public:
 			{
 				for (int j = 0; j < CODELENGTH; j++)
 				{
-					output += "| " + playingBoard[i][j];
+					char ch = playingBoard[i][j];
+					output += "| ";
+					output += ch;
 					output += " ";
 				}
+				output += "|";
+				output += to_string(playingBoard[i][CODELENGTH + 1]);
+				output += " ";
+				output += to_string(playingBoard[i][CODELENGTH]);
 				output += "|\n";
 			}
 
 		}
 		cout << output;
+
 		cout << bracketFlatLine << endl;
-		/*for (int i = 0; i < NUMOFTURNS; i++)
+		if (done)
 		{
-			cout <<
-		}*/
+			cout << user << " WINS!!!!";
+		}
 	}
 
-	//void populateBoard(int turnNum, string guess) {
-	//	
-	//}
+	//retrieves guess from the user
+	void getGuess() {
+		string guess = "";
+		cout << "What is your Guess" << endl;
+		guess = getInput("Guess");
+		checkGuess(guess);
+		turnNum++;
+	}
 
-	string getGuess() {
-		string guess;
+	//part of the retreival service
+	string getInput(string inputName) {
+		string input;
 		int checkResult;
 
-		cout << "What is your Guess" << endl;
 
-		getline(cin, guess, '\n');
+		getline(cin, input, '\n');
 
 		//Check to make sure guess is valid, then populate array
-		checkResult = guessCheck(guess);
+		checkResult = inputValidation(input);
 
-		while (checkResult != VALID)
+		if (checkResult != VALID)
 		{
-			cout << "Error : Guess " << guess << " is";
+			cout << "Error : " << inputName << " " << input << " is";
 			switch (checkResult)
 			{
 			case 0:
@@ -141,10 +232,22 @@ public:
 			case 3:
 				cout << " too long" << endl;
 				break;
+			case 4:
+				cout << " too short" << endl;
+				break;
 			default:
 				cout << "Unknown Error : Try again";
 				break;
 			}
+			if (inputName == "Code")
+			{
+				setCode();
+			}
+			else
+			{
+				getGuess();
+			}
+			checkResult = inputValidation(input);
 		}
 
 
@@ -152,31 +255,34 @@ public:
 
 		//make it smart to predict what you are trying to say
 
-		return guess;
+		return input;
 	}
 
 	// returns int depending on guess... see Board.h
-	int guessCheck(string guess) {
+	int inputValidation(string input) {
 		//for now only uses leters A - E
 		// doesn't check that it's too short
 
-		int checkResult;
+		int checkResult = INVALID;
 
-		int validResults = 0;
+		int validResult = 0;
 
 		int guessArr[CODELENGTH];
 		int arrLoc = CODELENGTH - 1;
 
-		for (int i = guess.length(); i > 0; i--)
+		if (input.length() < CODELENGTH)
 		{
-			char guessChar = guess.back();
-			if (validResults > CODELENGTH)
-			{
-				return checkResult = TOO_LONG;
-			}
+			checkResult = TOO_SHORT;
+			return checkResult;
+		}
+
+		for (int i = input.length(); i > 0; i--)
+		{
+			char guessChar = input.back();
 
 			if (arrLoc < 0)
 			{
+				checkResult = TOO_LONG;
 				return checkResult;
 			}
 
@@ -186,40 +292,66 @@ public:
 			}
 			else if (VALID_CHARACTERS.find(guessChar) == string::npos)
 			{
-				return checkResult = INVALID;
+				checkResult = INVALID;
+				return checkResult;
 			}
 			else
 			{
 				guessArr[arrLoc] = guessChar;
 				arrLoc--;
-				validResults++;
 				checkResult = VALID;
 			}
+
+			input.pop_back();
 		}
 
 
-		guess.pop_back();
 
 
 		return checkResult;
 	}
 
+	// changes the array, implementation of guess
+	// also calculates red and white pins
+	void checkGuess(string guess)
+	{
+		int whitePegs = 0;
+		int redPegs = 0;
+		//checks for redPin
+		for (int i = CODELENGTH - 1; i >= 0; i--)
+		{
+			if (guess.back() == codeArr[i])
+			{
+				redPegs++;
+			}
+			else if (find(begin(codeArr), end(codeArr), guess.back()) != codeArr + CODELENGTH)
+			{
+				whitePegs++;
+			}
+			playingBoard[turnNum][i] = char(guess.back());
+			guess.pop_back();
+		}
+		//redPegs
+		playingBoard[turnNum][CODELENGTH + 1] = redPegs;
+		//whitePegs
+		playingBoard[turnNum][CODELENGTH] = whitePegs;
+		system("CLS");
+		if (redPegs == 4)
+		{
+			done = true;
+		}
+
+		drawBoard();
+	}
 } board;
 
 int main() {
 	bool done = false;
-	int turnNum = 0;
-	int numOfTurns = 8;
-
-
 	board.initBoard();
-
-
-
-	while (!done && turnNum < numOfTurns) {
+	while (!done)
+	{
 		board.getGuess();
-
-
+		
 	}
 
 
