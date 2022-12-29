@@ -2,6 +2,17 @@
 #include "Board.h"
 #include <string>
 
+/* TODO :
+* Create a reset Game function
+* Create a new function to deal with yes no questions ?
+* Create a more efficient way to clear the screen
+	* create a reset screen function
+*
+*
+*
+
+*/
+
 using namespace std;
 class GameBoard
 {
@@ -28,6 +39,22 @@ public:
 
 	// added 2 to account for the number of white and red pins
 	int	playingBoard[NUMOFTURNS][CODELENGTH + 2];
+	bool yesOrNoQuestion(string guess) {
+		string acceptedValues = "Y";
+		string rejectValues = "N";
+		if (acceptedValues.find(guess) != string::npos)
+		{
+			return true;
+		}
+		else if (rejectValues.find(guess) != string::npos)
+		{
+			return false;
+		}
+		else
+		{
+			throw "ERROR : Invalid Input";
+		}
+	}
 	void initBoard() {
 		for (int i = 0; i < CODELENGTH + 2; i++)
 		{
@@ -36,6 +63,7 @@ public:
 				playingBoard[i][j] = 0;
 			}
 		}
+		turnNum = 0;
 		// creates a 2D array, maybe make dynamic later
 		cout << "Welcome to MasterMind\n";
 		cout << "Press enter to continue\n";
@@ -351,7 +379,36 @@ int main() {
 	while (!done)
 	{
 		board.getGuess();
-		
+		if (board.done)
+		{
+			bool ask = true;
+			while (ask)
+			{
+			string answer;
+			cout << "Do you want to play again?";
+			getline(cin, answer, '\n');
+				ask = false;
+				try
+				{
+					if (board.yesOrNoQuestion(answer))
+					{
+						board.resetGame();
+					}
+					else
+					{
+						done = true;
+					}
+				}
+				catch (const std::exception&)
+				{
+					ask = true;
+					system("CLS");
+					cout << "Wrong input\nYou typed " << answer;
+				}
+			}
+
+
+		}
 	}
 
 
