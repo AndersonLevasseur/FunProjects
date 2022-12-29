@@ -39,22 +39,8 @@ public:
 
 	// added 2 to account for the number of white and red pins
 	int	playingBoard[NUMOFTURNS][CODELENGTH + 2];
-	bool yesOrNoQuestion(string guess) {
-		string acceptedValues = "Y";
-		string rejectValues = "N";
-		if (acceptedValues.find(guess) != string::npos)
-		{
-			return true;
-		}
-		else if (rejectValues.find(guess) != string::npos)
-		{
-			return false;
-		}
-		else
-		{
-			throw "ERROR : Invalid Input";
-		}
-	}
+	
+	
 	void initBoard() {
 		for (int i = 0; i < CODELENGTH + 2; i++)
 		{
@@ -105,9 +91,28 @@ public:
 
 	void resetGame()
 	{
+		system("CLS");
+		initBoard();
 
 	}
 
+	bool yesOrNoQuestion(string guess) {
+		string acceptedValues = "Y";
+		string rejectValues = "N";
+		if (acceptedValues.find(guess) != string::npos)
+		{
+			return true;
+		}
+		else if (rejectValues.find(guess) != string::npos)
+		{
+			return false;
+		}
+		else
+		{
+			throw "ERROR : Invalid Input";
+		}
+	}
+	
 	void setMode()
 	{
 		string modeSelect = "";
@@ -222,7 +227,7 @@ public:
 		cout << bracketFlatLine << endl;
 		if (done)
 		{
-			cout << user << " WINS!!!!";
+			cout << user << " WINS!!!!" << endl;
 		}
 	}
 
@@ -385,7 +390,7 @@ int main() {
 			while (ask)
 			{
 			string answer;
-			cout << "Do you want to play again?";
+			cout << "Do you want to play again?\n";
 			getline(cin, answer, '\n');
 				ask = false;
 				try
@@ -403,14 +408,10 @@ int main() {
 				{
 					ask = true;
 					system("CLS");
-					cout << "Wrong input\nYou typed " << answer;
+					cout << "Wrong input\nYou typed " << answer << endl;
 				}
 			}
-
-
 		}
 	}
-
-
 	return 0;
 }
