@@ -1,6 +1,6 @@
-#include <string>
 #include "Board.h"
-#include <iostream>
+#include "User.cpp"
+
 
 using namespace std;
 class GameBoard
@@ -22,8 +22,11 @@ public:
 	string emptyLine = "|   |";
 	string flatLine = "_____";
 	string bracketFlatLine = "|-----";
-	string user;
 
+	User emptyUser;
+	User users[99] = { emptyUser };
+	User currentUser;
+	int numUsers = 0;
 
 
 	// added 2 to account for the number of white and red pins
@@ -43,13 +46,6 @@ public:
 		cout << "Welcome to MasterMind\n";
 		cout << "Press enter to continue\n";
 		getline(cin, pause, '\n');
-		system("CLS");
-		setUser();
-		system("CLS");
-		setMode();
-		system("CLS");
-		setCode();
-		system("CLS");
 		{
 			for (int i = 0; i < CODELENGTH; i++)
 			{
@@ -75,7 +71,6 @@ public:
 
 			header += headerHash + headerDash + "MASTERMINDS" + headerDash + headerHash + "|\n" + columnNumbers;
 		}
-		drawBoard();
 	}
 
 	void resetGame()
@@ -141,11 +136,16 @@ public:
 	// gathers users name
 	void setUser()
 	{
+		string userStr;
 		cout << "What is your name?" << endl;
-		getline(cin, user, '\n');
-		if (user == "Hannah" || user == "hannah")
+		getline(cin, userStr, '\n');
+		if (userStr == "Hannah" || userStr == "hannah")
 		{
-			user = "TIM";
+			userStr = "TIM";
+		}
+		for (int i = 0; i < numUsers; i++)
+		{
+
 		}
 	}
 
@@ -364,5 +364,11 @@ public:
 		}
 
 		drawBoard();
+	}
+
+	//clears board
+	void clearBoard()
+	{
+		system("CLS");
 	}
 };
