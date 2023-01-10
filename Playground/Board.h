@@ -15,6 +15,8 @@ const int REPEAT = 2;
 const int TOO_LONG = 3;
 const int TOO_SHORT = 4;
 
-// setting code
-
+//setting code
 const std::string VALID_CHARACTERS = "AaBbCc";
+
+//gameBoard
+const int MAXNUMOFBOARDS = 5;

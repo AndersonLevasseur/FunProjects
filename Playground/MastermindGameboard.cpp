@@ -5,6 +5,41 @@
 using namespace std;
 class GameBoard
 {
+	// changes the array, implementation of guess
+	// also calculates red and white pins
+	// doesn't need to be public, extension of getGuess
+	void checkGuess(string guess)
+	{
+		int whitePegs = 0;
+		int redPegs = 0;
+		//checks for redPin
+		for (int i = CODELENGTH - 1; i >= 0; i--)
+		{
+			if (guess.back() == codeArr[i])
+			{
+				redPegs++;
+			}
+			else if (find(begin(codeArr), end(codeArr), guess.back()) != codeArr + CODELENGTH)
+			{
+				whitePegs++;
+			}
+			playingBoard[turnNum][i] = char(guess.back());
+			guess.pop_back();
+		}
+		//redPegs
+		playingBoard[turnNum][CODELENGTH + 1] = redPegs;
+		//whitePegs
+		playingBoard[turnNum][CODELENGTH] = whitePegs;
+
+
+		if (redPegs == 4)
+		{
+			done = true;
+		}
+
+		drawBoard();
+	}
+
 public:
 
 	string pause;
@@ -24,7 +59,7 @@ public:
 	string bracketFlatLine = "|-----";
 
 	User emptyUser;
-	User users[99] = { emptyUser };
+	User users[20] = { emptyUser };
 	User currentUser;
 	int numUsers = 0;
 
@@ -34,9 +69,10 @@ public:
 
 
 	void initBoard() {
-		for (int i = 0; i < CODELENGTH + 2; i++)
+		clearBoard();
+		for (int i = 0; i < NUMOFTURNS; i++)
 		{
-			for (int j = 0; j < NUMOFTURNS; j++)
+			for (int j = 0; j < CODELENGTH + 2; j++)
 			{
 				playingBoard[i][j] = 0;
 			}
@@ -46,6 +82,7 @@ public:
 		cout << "Welcome to MasterMind\n";
 		cout << "Press enter to continue\n";
 		getline(cin, pause, '\n');
+		// not a duplicate of drawboard, setting header and the width of the board
 		{
 			for (int i = 0; i < CODELENGTH; i++)
 			{
@@ -75,7 +112,7 @@ public:
 
 	void resetGame()
 	{
-		system("CLS");
+		clearBoard();
 		initBoard();
 
 	}
@@ -99,6 +136,7 @@ public:
 
 	void setMode()
 	{
+		clearBoard();
 		string modeSelect = "";
 		cout << "Single or Multiplayer?\nType 'Y' for Single Player or 'N' for Multiplayer\n";
 		getline(cin, modeSelect, '\n');
@@ -133,9 +171,11 @@ public:
 			mode = MULTIPLAYER;
 		}
 	}
-	// gathers users name
-	void setUser()
+	// gathers users name and doesn't set as currentUser
+	// maybe move whole progra
+	string setUser()
 	{
+		clearBoard();
 		string userStr;
 		cout << "What is your name?" << endl;
 		getline(cin, userStr, '\n');
@@ -143,14 +183,16 @@ public:
 		{
 			userStr = "TIM";
 		}
-		for (int i = 0; i < numUsers; i++)
-		{
-
-		}
+		return userStr;
 	}
 
+	void setCurrentUser(User currentU)
+	{
+		currentUser = currentU;
+	}
 	//sets code to be sought and puts it into an array
 	void setCode() {
+		clearBoard();
 		string codeStr;
 		if (mode == SINGLEPLAYER)
 		{
@@ -184,6 +226,7 @@ public:
 	// draws boar given the state of playingBoard
 	void drawBoard() {
 		// initial drawing - creates empty board
+		clearBoard();
 		cout << flatLine << header << bracketFlatLine;
 
 		string output = "";
@@ -216,7 +259,7 @@ public:
 		cout << bracketFlatLine << endl;
 		if (done)
 		{
-			cout << user << " WINS!!!!" << endl;
+			cout << currentUser.name << " WINS!!!!" << endl;
 		}
 	}
 
@@ -333,38 +376,6 @@ public:
 		return checkResult;
 	}
 
-	// changes the array, implementation of guess
-	// also calculates red and white pins
-	void checkGuess(string guess)
-	{
-		int whitePegs = 0;
-		int redPegs = 0;
-		//checks for redPin
-		for (int i = CODELENGTH - 1; i >= 0; i--)
-		{
-			if (guess.back() == codeArr[i])
-			{
-				redPegs++;
-			}
-			else if (find(begin(codeArr), end(codeArr), guess.back()) != codeArr + CODELENGTH)
-			{
-				whitePegs++;
-			}
-			playingBoard[turnNum][i] = char(guess.back());
-			guess.pop_back();
-		}
-		//redPegs
-		playingBoard[turnNum][CODELENGTH + 1] = redPegs;
-		//whitePegs
-		playingBoard[turnNum][CODELENGTH] = whitePegs;
-		system("CLS");
-		if (redPegs == 4)
-		{
-			done = true;
-		}
-
-		drawBoard();
-	}
 
 	//clears board
 	void clearBoard()

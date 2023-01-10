@@ -3,19 +3,22 @@
 
 using namespace std;
 class User {
-	string name;
+public:
 	string record;
-	int wins;
-	int losses;
-	int gamesPlayed;
+	int wins = 0;
+	int losses = 0;
+	string name = "";
+	int gamesPlayed = 0;
 
-	void setName(string newName) 
-	{
-		name = newName;
-	}
 
 	void setRecord()
 	{
 		record = to_string(wins) + "-" + to_string(losses);
 	}
+
+	/*void setLocation(int loc)
+	{
+		location = loc;
+		locationChanged++;
+	}*/
 };
