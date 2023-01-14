@@ -32,6 +32,7 @@ void fileStartup()
 	}
 	fileNames.close();
 }
+
 void userStartup() {
 	//User initialize
 	ifstream userFile;
@@ -76,16 +77,16 @@ void userStartup() {
 		}
 		if (tempUser.name.length() > 1)
 		{
-		userArr[i] = tempUser;
-		i++;
-		numOfUsers++;
+			userArr[i] = tempUser;
+			i++;
+			numOfUsers++;
 		}
 	}
 	userArr;
 	userFile.close();
 }
 
-User writeUser(string userName)
+User writeUser(User user)
 {
 	ofstream userFile;
 	userFile.open("allUsers.txt", ios::app);
@@ -93,8 +94,6 @@ User writeUser(string userName)
 	{
 		throw "Open failed";
 	}
-	User user;
-	user.name = userName;
 
 	userFile << user.name << "\n";
 	userFile << to_string(user.wins) << "\n";
@@ -104,6 +103,22 @@ User writeUser(string userName)
 
 	userFile.close();
 	return user;
+}
+
+void close()
+{
+	ofstream userFile;
+	//Should clear file?
+	userFile.open("allUsers.txt");
+	userFile.close();
+	if (userFile.fail())
+	{
+		throw "Couldn't allUser in close()";
+	}
+	for (int i = 0; i < numOfUsers; i++)
+	{
+		writeUser(userArr[i]);
+	}
 }
 
 void setUser(GameBoard board)
@@ -126,7 +141,34 @@ void setUser(GameBoard board)
 	if (newUser)
 	{
 		//board.currentUser = writeUser(userStr);
-		board.setCurrentUser(writeUser(userStr));
+		User newUser;
+		newUser.name = userStr;
+		board.setCurrentUser(writeUser(newUser));
+	}
+}
+
+//doesn't quite work
+void resetGame(GameBoard board)
+{
+	board.clearBoard();
+	board.resetBoard();
+	//include in initBoard?
+	{
+		board.clearBoard();
+		cout << "Same person?" << endl;
+		string question;
+		getline(cin, question, '\n');
+		bool yesNo = board.yesOrNoQuestion(question);
+		if (!yesNo)
+		{
+			setUser(board);
+		}
+		board.clearBoard();
+		board.setMode();
+		board.clearBoard();
+		board.setCode();
+		board.clearBoard();
+		board.drawBoard();
 	}
 }
 
@@ -166,7 +208,7 @@ int main() {
 				{
 					if (board.yesOrNoQuestion(answer))
 					{
-						board.resetGame();
+						resetGame(board);
 					}
 					else
 					{

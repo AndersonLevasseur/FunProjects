@@ -61,7 +61,6 @@ public:
 	User emptyUser;
 	User users[20] = { emptyUser };
 	User currentUser;
-	int numUsers = 0;
 
 
 	// added 2 to account for the number of white and red pins
@@ -70,18 +69,7 @@ public:
 
 	void initBoard() {
 		clearBoard();
-		for (int i = 0; i < NUMOFTURNS; i++)
-		{
-			for (int j = 0; j < CODELENGTH + 2; j++)
-			{
-				playingBoard[i][j] = 0;
-			}
-		}
-		turnNum = 0;
-		// creates a 2D array, maybe make dynamic later
-		cout << "Welcome to MasterMind\n";
-		cout << "Press enter to continue\n";
-		getline(cin, pause, '\n');
+		resetBoard();
 		// not a duplicate of drawboard, setting header and the width of the board
 		{
 			for (int i = 0; i < CODELENGTH; i++)
@@ -110,30 +98,80 @@ public:
 		}
 	}
 
-	void resetGame()
+	void resetBoard()
 	{
-		clearBoard();
-		initBoard();
+		done = false;
+		duplicates = false;
+		turnNum = 0;
+
+		// populates codeArr with Null's
+		for (int i = 0; i < CODELENGTH; i++)
+		{
+			codeArr[i] = NULL;
+		}
+
+		//populates playingBoard with 0's
+		for (int i = 0; i < NUMOFTURNS; i++)
+		{
+			for (int j = 0; j < CODELENGTH + 2; j++)
+			{
+				playingBoard[i][j] = 0;
+			}
+		}
+		// creates a 2D array, maybe make dynamic later
+		cout << "Welcome to MasterMind\n";
+		cout << "Press enter to continue\n";
+		getline(cin, pause, '\n');
 
 	}
 
 	bool yesOrNoQuestion(string guess) {
-		string acceptedValues = "Y";
-		string rejectValues = "N";
-		if (acceptedValues.find(guess) != string::npos)
+		bool validGuess = false;
+		string acceptedValues[2] = { "Y", "y" };
+		string rejectValues[2] = { "N", "n" };
+
+		int length = acceptedValues->length() + rejectValues->length();
+
+		string acceptedValue, rejectValue;
+		for (int i = 0; i < length; i++)
 		{
-			return true;
+			acceptedValue = acceptedValues[i];
+			rejectValue = rejectValues[i];
+			if (acceptedValue == guess)
+			{
+				validGuess = true;
+				return true;
+			}
+			else if (rejectValue == guess)
+			{
+				validGuess = true;
+				return false;
+			}
+			else
+			{
+				validGuess = false;
+			}
 		}
-		else if (rejectValues.find(guess) != string::npos)
+		if (!validGuess)
 		{
-			return false;
-		}
-		else
-		{
-			throw "ERROR : Invalid Input";
+			cout << "ERROR : Invalid Input\nPlease enter : ";
+			for (int i = 0; i < length; i++)
+			{
+				acceptedValue = acceptedValues[i];
+				rejectValue = rejectValues[i];
+
+				if (i > 0)
+				{
+					cout << " or ";
+				}
+				cout << acceptedValue << " or " << rejectValue;
+			}
+			string newGuess;
+			getline(cin, newGuess, '\n');
+			return yesOrNoQuestion(newGuess);
 		}
 	}
-
+	// doesn't use yesOrNoQuestion
 	void setMode()
 	{
 		clearBoard();
@@ -178,10 +216,13 @@ public:
 		clearBoard();
 		string userStr;
 		cout << "What is your name?" << endl;
+		//Doesn't wait for user input
 		getline(cin, userStr, '\n');
-		if (userStr == "Hannah" || userStr == "hannah")
 		{
-			userStr = "TIM";
+			if (userStr == "Hannah" || userStr == "hannah")
+			{
+				userStr = "TIM";
+			}
 		}
 		return userStr;
 	}
@@ -190,6 +231,7 @@ public:
 	{
 		currentUser = currentU;
 	}
+
 	//sets code to be sought and puts it into an array
 	void setCode() {
 		clearBoard();
