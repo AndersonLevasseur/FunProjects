@@ -37,7 +37,6 @@ class GameBoard
 			done = true;
 		}
 
-		drawBoard();
 	}
 
 public:
@@ -59,7 +58,6 @@ public:
 	string bracketFlatLine = "|-----";
 
 	User emptyUser;
-	User users[20] = { emptyUser };
 	User currentUser;
 
 
@@ -233,7 +231,7 @@ public:
 	}
 
 	//sets code to be sought and puts it into an array
-	void setCode() {
+	string setCode(bool valid) {
 		clearBoard();
 		string codeStr;
 		if (mode == SINGLEPLAYER)
@@ -255,11 +253,15 @@ public:
 		{
 			cout << "Please enter " << CODELENGTH << " letters limited to " << VALID_CHARACTERS << endl;
 			codeStr = getInput("Code");
-			for (int i = CODELENGTH - 1; i >= 0; i--)
+			if (valid)
 			{
-				codeArr[i] = codeStr.back();
-				codeStr.pop_back();
+				for (int i = CODELENGTH - 1; i >= 0; i--)
+				{
+					codeArr[i] = codeStr.back();
+					codeStr.pop_back();
+				}
 			}
+			return codeStr;
 		}
 		// NEEDS ERROR testing baad
 		// add testing to getInput, should apply to both
@@ -302,16 +304,31 @@ public:
 		if (done)
 		{
 			cout << currentUser.name << " WINS!!!!" << endl;
+			currentUser.gamesPlayed++;
+			currentUser.wins++;
+			currentUser.setRecord();
+		}
+		else if (turnNum >= NUMOFTURNS)
+		{
+			cout << currentUser.name << " LOST!!!!" << endl;
+			currentUser.gamesPlayed++;
+			currentUser.losses++;
+			currentUser.setRecord();
+			done = true;
 		}
 	}
 
 	//retrieves guess from the user
-	void getGuess() {
+	string getGuess(bool valid) {
 		string guess = "";
 		cout << "What is your Guess" << endl;
 		guess = getInput("Guess");
-		checkGuess(guess);
-		turnNum++;
+		if (valid)
+		{
+			checkGuess(guess);
+			turnNum++;
+		}
+		return guess;
 	}
 
 	//part of the retreival service
@@ -346,13 +363,15 @@ public:
 				cout << "Unknown Error : Try again";
 				break;
 			}
+
 			if (inputName == "Code")
 			{
-				setCode();
+				input = setCode(false);
 			}
 			else
 			{
-				getGuess();
+				input = getGuess(false);
+
 			}
 			checkResult = inputValidation(input);
 		}

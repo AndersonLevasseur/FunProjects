@@ -1,5 +1,6 @@
 #include "MastermindGameboard.cpp"
 #include <fstream>
+#include <vector>
 
 /* TODO :
 * Write a method to search for files
@@ -9,8 +10,8 @@
 
 using namespace std;
 string files[MAXNUMOFBOARDS];
-User userArr[9];
-int numOfUsers;
+vector <User> userVect;
+int numOfUsers = 0;
 
 //seraches for existing board files in fileNames.txt
 void fileStartup()
@@ -77,12 +78,18 @@ void userStartup() {
 		}
 		if (tempUser.name.length() > 1)
 		{
-			userArr[i] = tempUser;
+			if (userVect.size() <= i)
+			{
+				userVect.push_back(tempUser);
+			}
+			else
+			{
+				userVect.at(i) = tempUser;
+			}
 			i++;
 			numOfUsers++;
 		}
 	}
-	userArr;
 	userFile.close();
 }
 
@@ -105,32 +112,45 @@ User writeUser(User user)
 	return user;
 }
 
-void close()
+void close(GameBoard &board)
 {
+	if (board.currentUser.loc == -1)
+	{
+		userVect.push_back(board.currentUser);
+		close(board);
+		userStartup();
+	}
+	else
+	{
+		userVect.at(board.currentUser.loc) = board.currentUser;
+	}
+
 	ofstream userFile;
 	//Should clear file?
 	userFile.open("allUsers.txt");
-	userFile.close();
+
 	if (userFile.fail())
 	{
 		throw "Couldn't allUser in close()";
 	}
-	for (int i = 0; i < numOfUsers; i++)
+	for (int i = 0; i < userVect.size(); i++)
 	{
-		writeUser(userArr[i]);
+		writeUser(userVect.at(i));
 	}
+	userFile.close();
 }
 
-void setUser(GameBoard board)
+void setUser(GameBoard& board)
 {
 	string userStr = board.setUser();
 	bool newUser = false;
-	for (int i = 0; i <= numOfUsers; i++)
+	for (int i = 0; i < numOfUsers; i++)
 	{
-		if (userArr[i].name == userStr)
+		if (userVect.at(i).name == userStr)
 		{
-			board.currentUser = userArr[i];
-			i = numOfUsers;
+			board.currentUser = userVect.at(i);
+			board.currentUser.loc = i;
+			i = userVect.size();
 			newUser = false;
 		}
 		else
@@ -143,13 +163,27 @@ void setUser(GameBoard board)
 		//board.currentUser = writeUser(userStr);
 		User newUser;
 		newUser.name = userStr;
+		newUser.loc = -1;
+
 		board.setCurrentUser(writeUser(newUser));
 	}
 }
 
 //doesn't quite work
-void resetGame(GameBoard board)
+void resetGame(GameBoard& board)
 {
+	if (board.currentUser.loc == -1)
+	{
+		userVect.push_back(board.currentUser);
+		close(board);
+		userStartup();
+	}
+	else
+	{
+		userVect.at(board.currentUser.loc) = board.currentUser;
+	}
+
+
 	board.clearBoard();
 	board.resetBoard();
 	//include in initBoard?
@@ -166,7 +200,7 @@ void resetGame(GameBoard board)
 		board.clearBoard();
 		board.setMode();
 		board.clearBoard();
-		board.setCode();
+		board.setCode(true);
 		board.clearBoard();
 		board.drawBoard();
 	}
@@ -187,13 +221,13 @@ int main() {
 	board.clearBoard();
 	board.setMode();
 	board.clearBoard();
-	board.setCode();
+	board.setCode(true);
 	board.clearBoard();
 	board.drawBoard();
 
 	while (!done)
 	{
-		board.getGuess();
+		board.getGuess(true);
 		board.drawBoard();
 		if (board.done)
 		{
@@ -213,6 +247,7 @@ int main() {
 					else
 					{
 						done = true;
+						close(board);
 					}
 				}
 				catch (const std::exception&)

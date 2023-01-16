@@ -9,6 +9,7 @@ public:
 	int losses = 0;
 	string name = "";
 	int gamesPlayed = 0;
+	int loc;
 
 
 	void setRecord()
