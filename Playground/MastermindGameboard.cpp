@@ -2,6 +2,7 @@
 #include "User.cpp"
 
 
+
 using namespace std;
 class GameBoard
 {
@@ -38,9 +39,8 @@ class GameBoard
 		}
 
 	}
-
 public:
-
+	
 	string pause;
 	bool done = false;
 	bool duplicates = false;
@@ -92,7 +92,7 @@ public:
 
 			columnNumbers += "R W| \n";
 
-			header += headerHash + headerDash + "MASTERMINDS" + headerDash + headerHash + "|\n" + columnNumbers;
+			header += headerHash + headerDash + "MASTERMINDS" + headerDash + headerHash + "|\n";
 		}
 	}
 
@@ -128,8 +128,9 @@ public:
 		string acceptedValues[2] = { "Y", "y" };
 		string rejectValues[2] = { "N", "n" };
 
-		int length = acceptedValues->length() + rejectValues->length();
-
+		int length = sizeof(acceptedValues) / sizeof(acceptedValues[0]);
+		length += (sizeof(rejectValues) / sizeof(rejectValues[0]));
+		length -= 1;
 		string acceptedValue, rejectValue;
 		for (int i = 0; i < length; i++)
 		{
@@ -212,9 +213,8 @@ public:
 	string setUser()
 	{
 		clearBoard();
-		string userStr;
+		string userStr = "";
 		cout << "What is your name?" << endl;
-		//Doesn't wait for user input
 		getline(cin, userStr, '\n');
 		{
 			if (userStr == "Hannah" || userStr == "hannah")
@@ -271,7 +271,7 @@ public:
 	void drawBoard() {
 		// initial drawing - creates empty board
 		clearBoard();
-		cout << flatLine << header << bracketFlatLine;
+		cout << flatLine << header << columnNumbers << bracketFlatLine;
 
 		string output = "";
 		for (int i = 0; i < NUMOFTURNS; i++)

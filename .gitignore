@@ -362,3 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Playground/allUsers.txt
+/Stenography picture search/Stenography picture search.vcxproj.filters
+/Stenography picture search/Stenography picture search.vcxproj
