@@ -6,8 +6,8 @@
 
 ## Steps
 1. convert picture to binary
-  - Can use "https://www.dcode.fr/binary-image"
-  - Converts HEX to binary
+    - Can use "https://www.dcode.fr/binary-image"
+    - Converts HEX to binary
 1. Choose starting bye
 1. Choose the needed recorded bit occurence
 1. Choose the number of bits per character
